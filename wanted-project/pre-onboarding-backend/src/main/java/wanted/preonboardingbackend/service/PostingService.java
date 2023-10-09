@@ -52,11 +52,20 @@ public class PostingService {
                 //field.get(객체)를 넣으면 해당 객체의 필드에 해당하는 값을 가져올 수 있다
                 if (value == null){
                     throw new IllegalArgumentException(field.getName()+ "is null");
+                }if (!field.getName().equals("companyId")){
+                    Field existingField = existingPosting.getClass().getDeclaredField(field.getName());
+                    //해당 클래스의 들어가 getDeclaredField();을 호출 괄호 안에 필드의 이름을 넣으면
+                    //필드값으로 해당 필드값 반환
+                    existingField.setAccessible(true);
+                    existingField.set(existingPosting,value);
+                    existingField.setAccessible(false);
                 }
-                field.set(existingPosting, value);
+
             }catch (IllegalAccessException e){
                 e.printStackTrace();;
-            }finally {
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            } finally {
                 field.setAccessible(false);
             }
         }
@@ -75,6 +84,16 @@ public class PostingService {
     private Posting toUpdateEntity(PostingDto dto, String companyId){
         dto.setCompanyId(companyId);
         return new Posting(dto);
+    }
+
+    public void delete(int id) {
+        if (checkAuthority(id)){
+
+        }
+    }
+    private boolean checkAuthority(int id){
+        memoryPostingRepository.findById(id)
+        if ()
     }
 }
 //    public static void checkNull(PostingDto postingDto) {

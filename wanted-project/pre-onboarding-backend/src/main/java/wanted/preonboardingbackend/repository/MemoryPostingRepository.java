@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface MemoryPostingRepository extends JpaRepository<Posting, Integer> {
     Posting save(Posting posting);
     Optional<Posting> findByCompanyId(String companyId);
+    Optional<Posting> findById(int id);
 }

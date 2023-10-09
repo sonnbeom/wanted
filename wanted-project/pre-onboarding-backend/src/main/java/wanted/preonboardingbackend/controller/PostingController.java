@@ -2,10 +2,7 @@ package wanted.preonboardingbackend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import wanted.preonboardingbackend.dto.PostingDto;
 import wanted.preonboardingbackend.dto.PostingUpdateDto;
 import wanted.preonboardingbackend.service.PostingService;
@@ -36,4 +33,10 @@ public class PostingController {
     public String updateTest(){
         return "update";
     }
+    @DeleteMapping("/delete/{id}")
+    public String delete(@PathVariable int id){
+        postingService.delete(id);
+        return "";
+    }
+
 }
