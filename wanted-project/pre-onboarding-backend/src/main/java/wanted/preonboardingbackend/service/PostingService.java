@@ -86,14 +86,20 @@ public class PostingService {
         return new Posting(dto);
     }
 
-    public void delete(int id) {
-        if (checkAuthority(id)){
-
+    public void delete(int id, String companyId) {
+        Posting posting = findByPostingId(id);
+        if (checkAuthority(companyId,posting)){
+            memoryPostingRepository.deleteById(id);
         }
     }
-    private boolean checkAuthority(int id){
-        memoryPostingRepository.findById(id)
-        if ()
+    private Posting findByPostingId(int id){
+        return memoryPostingRepository.findById(id)
+                .orElseThrow(()->new NotFoundException("Posting not found by postId: +"+id));
+    }
+    private boolean checkAuthority(String companyId, Posting posting){
+        if (posting.getCompanyId().equals(companyId)){
+            return true;
+        } throw new NotFoundException("Posting not found by company id:"+companyId);
     }
 }
 //    public static void checkNull(PostingDto postingDto) {

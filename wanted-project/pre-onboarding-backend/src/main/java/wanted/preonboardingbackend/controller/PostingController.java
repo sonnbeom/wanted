@@ -33,9 +33,14 @@ public class PostingController {
     public String updateTest(){
         return "update";
     }
-    @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable int id){
-        postingService.delete(id);
+    //스프링 시큐리티로 해당 회사의 아이디를 확인하는 것으로 가정했습니다.
+    @GetMapping("/delete")
+    public String deleteTest(){
+        return "delete";
+    }
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable int id, @RequestParam String companyId){
+        postingService.delete(id, companyId);
         return "";
     }
 
