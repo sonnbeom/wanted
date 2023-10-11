@@ -1,17 +1,21 @@
 package wanted.preonboardingbackend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
+import wanted.preonboardingbackend.dto.ListPostingDto;
 import wanted.preonboardingbackend.dto.PostingDto;
 import wanted.preonboardingbackend.dto.PostingUpdateDto;
 import wanted.preonboardingbackend.entity.Company;
+import wanted.preonboardingbackend.entity.PostList;
 import wanted.preonboardingbackend.entity.Posting;
 import wanted.preonboardingbackend.exception.NotFoundException;
 import wanted.preonboardingbackend.repository.MemoryCompanyRepository;
 import wanted.preonboardingbackend.repository.MemoryPostingRepository;
+import wanted.preonboardingbackend.repository.PostListRepository;
+
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,26 +24,40 @@ public class PostingService {
     MemoryPostingRepository memoryPostingRepository;
     @Autowired
     MemoryCompanyRepository memoryCompanyRepository;
+    @Autowired
+    CompanyService companyService;
+    @Autowired
+    PostListRepository postListRepository;
+
 
     public void register(PostingDto postingDto) {
 
-        if (checkId(postingDto.getCompanyId())) {
-            Posting posting = toEntity(postingDto);
-            memoryPostingRepository.save(posting);
-        }
+//        if (checkId(postingDto.getCompanyId())) {
+//            Posting posting = toEntity(postingDto);
+//            memoryPostingRepository.save(posting);
+//        }
+        Company company = findByCompanyId(postingDto.getCompanyId());
+        Posting posting = new Posting(postingDto,company);
+        memoryPostingRepository.save(posting);
     }
-    boolean checkId(String id) throws NotFoundException {
-        Optional<Company> company = memoryCompanyRepository.findById(id);
+//    boolean checkId(String id) throws NotFoundException {
+//        Optional<Company> company = memoryCompanyRepository.findById(id);
+//
+//        if (company.isPresent()){
+//            return  true;
+//        }else {
+//            throw new NotFoundException("Company ID not found: " + id);
+//        }
+//    }
+//    private Posting toEntity(PostingDto postingDto){
+//         memoryCompanyRepository.findById(postingDto.getCompanyId());
+//        return new Posting(postingDto);
+//    }
+    private Company findByCompanyId(String companyId){
+        return companyService.findById(companyId);
+    }
 
-        if (company.isPresent()){
-            return  true;
-        }else {
-            throw new NotFoundException("Company ID not found: " + id);
-        }
-    }
-    private Posting toEntity(PostingDto postingDto){
-        return new Posting(postingDto);
-    }
+    //안 쓰는 건 이유가 있다 리플렉셔 확인
 
     private Posting setUpdatePosting(PostingUpdateDto postingUpdateDto, Posting existingPosting){
         Field[] fields = PostingUpdateDto.class.getDeclaredFields();
@@ -81,10 +99,10 @@ public class PostingService {
         Posting posting =  setUpdatePosting(updateDto, existingposting);
         memoryPostingRepository.save(posting);
     }
-    private Posting toUpdateEntity(PostingDto dto, String companyId){
-        dto.setCompanyId(companyId);
-        return new Posting(dto);
-    }
+//    private Posting toUpdateEntity(PostingDto dto, String companyId){
+//        dto.setCompanyId(companyId);
+//        return new Posting(dto);
+//    }
 
     public void delete(int id, String companyId) {
         Posting posting = findByPostingId(id);
@@ -92,14 +110,35 @@ public class PostingService {
             memoryPostingRepository.deleteById(id);
         }
     }
+//    public void delete(int id, String companyId){
+//        PostingDto postingDto = findPostingDtoById(id);
+//        if (checkAuthority(companyId,postingDto)){
+//            memoryPostingRepository.deleteById(id);
+//        }
+//    }
     private Posting findByPostingId(int id){
         return memoryPostingRepository.findById(id)
-                .orElseThrow(()->new NotFoundException("Posting not found by postId: +"+id));
+                .orElseThrow(()->new NotFoundException("Posting not found by post id: "+id));
     }
+//    private PostingDto findPostingDtoById(int id){
+//        return memoryPostingRepository.findPostingDtoById(id)
+//                .orElseThrow(()->new NotFoundException("Posting not found by post id "+ id));
+//    }
     private boolean checkAuthority(String companyId, Posting posting){
-        if (posting.getCompanyId().equals(companyId)){
+        if (posting.getCompany().getId().equals(companyId)){
             return true;
         } throw new NotFoundException("Posting not found by company id:"+companyId);
+    }
+        private boolean checkAuthority(String companyId, PostingDto dto){
+        if (dto.getCompanyId().equals(companyId)){
+            return true;
+        } throw new NotFoundException("Posting not found by company id:"+companyId);
+    }
+
+    public List<PostList> readAll() {
+        //게시글이 없을 땐 어떻게 하지
+        List<PostList> postList = postListRepository.findAll();
+        return postList;
     }
 }
 //    public static void checkNull(PostingDto postingDto) {

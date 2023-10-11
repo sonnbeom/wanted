@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 목록</title>
+</head>
+<body>
+<h1>게시글 목록</h1>
+
+<!-- 게시글이 없는 경우 메시지 표시 -->
+<div th:if="${postinglist.isEmpty()}">
+  <p th:text="${message}"></p>
+</div>
+
+<!-- 게시글이 있는 경우 목록 표시 -->
+<table th:if="${not postinglist.isEmpty()}">
+  <thead>
+  <tr>
+    <th>게시글 ID</th>
+    <th>회사 이름</th>
+    <th>국가</th>
+    <th>지역</th>
+    <th>직책</th>
+    <th>급여</th>
+    <th>기술</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- 리스트의 각 항목을 반복 -->
+  <tr th:each="post : ${postinglist}">
+    <td th:text="${post.id}"></td>
+    <td th:text="${post.companyName}"></td>
+    <td th:text="${post.country}"></td>
+    <td th:text="${post.region}"></td>
+    <td th:text="${post.position}"></td>
+    <td th:text="${post.pay}"></td>
+    <td th:text="${post.technology}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

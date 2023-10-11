@@ -2,15 +2,27 @@ package wanted.preonboardingbackend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import wanted.preonboardingbackend.dto.ListPostingDto;
 import wanted.preonboardingbackend.dto.PostingDto;
 import wanted.preonboardingbackend.dto.PostingUpdateDto;
+import wanted.preonboardingbackend.entity.PostList;
 import wanted.preonboardingbackend.service.PostingService;
+
+import java.util.List;
 
 @Controller
 public class PostingController {
     @Autowired
     PostingService postingService;
+    /**
+     *
+     * @Param BoardFormDto
+     * @Param BindingResult
+     * @return String
+     * @Author sHu
+     */
     @PostMapping("/register")
     public String uploadPosting(@ModelAttribute PostingDto postingDto){
         postingService.register(postingDto);
@@ -42,6 +54,15 @@ public class PostingController {
     public String delete(@PathVariable int id, @RequestParam String companyId){
         postingService.delete(id, companyId);
         return "";
+    }
+    @GetMapping("/readAll")
+    public String readAll(Model model){
+        List<PostList> list = postingService.readAll();
+        if (list.size() == 0){
+            model.addAttribute("message","게시글이 없습니다.");
+        }
+        model.addAttribute("postinglist", list);
+        return "postinglist";
     }
 
 }

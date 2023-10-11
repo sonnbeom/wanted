@@ -16,17 +16,17 @@ public class Posting {
     private int id;
     @Column(name = "position", nullable = false)
     private String position;
-    @Column(name = "company_id", nullable = false)
-    private String companyId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
     @Column(name = "pay", nullable = false)
     private int pay;
     @Column(name = "content", nullable = false)
     private String content;
     @Column(name = "technology", nullable = false)
     private String technology;
-
-    public Posting(PostingDto postingDto){
-        this.companyId = postingDto.getCompanyId();
+    public Posting(PostingDto postingDto, Company company){
+        this.company = company;
         this.position = postingDto.getPosition();
         this.pay = postingDto.getPay();
         this.content = postingDto.getContent();
