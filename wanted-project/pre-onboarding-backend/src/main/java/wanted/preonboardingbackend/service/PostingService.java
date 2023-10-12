@@ -8,6 +8,7 @@ import wanted.preonboardingbackend.dto.PostingUpdateDto;
 import wanted.preonboardingbackend.entity.Company;
 import wanted.preonboardingbackend.entity.PostList;
 import wanted.preonboardingbackend.entity.Posting;
+import wanted.preonboardingbackend.entity.PostingIdList;
 import wanted.preonboardingbackend.exception.NotFoundException;
 import wanted.preonboardingbackend.repository.MemoryCompanyRepository;
 import wanted.preonboardingbackend.repository.MemoryPostingRepository;
@@ -32,27 +33,15 @@ public class PostingService {
 
     public void register(PostingDto postingDto) {
 
-//        if (checkId(postingDto.getCompanyId())) {
-//            Posting posting = toEntity(postingDto);
-//            memoryPostingRepository.save(posting);
-//        }
         Company company = findByCompanyId(postingDto.getCompanyId());
         Posting posting = new Posting(postingDto,company);
-        memoryPostingRepository.save(posting);
+        Posting savedPosting = memoryPostingRepository.save(posting);
+        insertPostIdList(savedPosting);
     }
-//    boolean checkId(String id) throws NotFoundException {
-//        Optional<Company> company = memoryCompanyRepository.findById(id);
-//
-//        if (company.isPresent()){
-//            return  true;
-//        }else {
-//            throw new NotFoundException("Company ID not found: " + id);
-//        }
-//    }
-//    private Posting toEntity(PostingDto postingDto){
-//         memoryCompanyRepository.findById(postingDto.getCompanyId());
-//        return new Posting(postingDto);
-//    }
+    private void insertPostIdList(Posting posting) {
+        int postingId = posting.getId();
+
+    }
     private Company findByCompanyId(String companyId){
         return companyService.findById(companyId);
     }
@@ -139,6 +128,10 @@ public class PostingService {
         //게시글이 없을 땐 어떻게 하지
         List<PostList> postList = postListRepository.findAll();
         return postList;
+    }
+
+    public List<PostList> readByKeyword(String keyword) {
+        return postListRepository.findByKeyword(keyword);
     }
 }
 //    public static void checkNull(PostingDto postingDto) {

@@ -64,5 +64,17 @@ public class PostingController {
         model.addAttribute("postinglist", list);
         return "postinglist";
     }
-
+    @GetMapping("/searchtest")
+    public String searchTest(){
+        return "searchkeyword";
+    }
+    @GetMapping("/search")
+    public String readByKeyword(@RequestParam("search") String keyword, Model model){
+        List<PostList> list = postingService.readByKeyword(keyword);
+        if (list.size()==0){
+            model.addAttribute("message", "해당 검색어로 인한 게시물이 없습니다.");
+        }
+        model.addAttribute("postinglist", list);
+        return "searchresult";
+    }
 }

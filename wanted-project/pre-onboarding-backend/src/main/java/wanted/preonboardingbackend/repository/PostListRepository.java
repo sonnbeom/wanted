@@ -11,7 +11,7 @@ import java.util.List;
 public interface PostListRepository extends JpaRepository<PostList, Integer> {
     List<PostList> findAll();
 
-    @Query("SELECT p FROM PostList p WHERE " +
+    @Query("SELECT p FROM post_list p WHERE " +
             "p.companyName LIKE %:keyword% OR " +
             "p.country LIKE %:keyword% OR " +
             "p.region LIKE %:keyword% OR " +
@@ -20,3 +20,5 @@ public interface PostListRepository extends JpaRepository<PostList, Integer> {
     )
     List<PostList> findByKeyword(@Param("keyword") String keyword);
 }
+
+
