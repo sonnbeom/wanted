@@ -1,5 +1,6 @@
 package wanted.preonboardingbackend.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import wanted.preonboardingbackend.dto.ListPostingDto;
@@ -31,16 +32,15 @@ public class PostingService {
     CompanyService companyService;
     @Autowired
     PostListRepository postListRepository;
-    @Autowired
-    IdListService idListService;
 
 
 
-    public void register(PostingDto postingDto) {
+
+    @Transactional
+    public Posting register(PostingDto postingDto) {
         Company company = findByCompanyId(postingDto.getCompanyId());
         Posting posting = new Posting(postingDto,company);
-        Posting savedPosting = memoryPostingRepository.save(posting);
-        idListService.insertPostIdList(savedPosting);
+        return memoryPostingRepository.save(posting);
     }
 
     private Company findByCompanyId(String companyId){
@@ -83,13 +83,13 @@ public class PostingService {
         return memoryPostingRepository.findByCompanyId(companyID)
                 .orElseThrow(()->new NotFoundException("Posting not found by company id: "+ companyID));
     }
-
+    @Transactional
     public void update(PostingUpdateDto updateDto, String companyId) {
         Posting existingposting = checkPosting(companyId);
         Posting posting =  setUpdatePosting(updateDto, existingposting);
         memoryPostingRepository.save(posting);
     }
-
+    @Transactional
     public void delete(int id, String companyId) {
         Posting posting = findByPostingId(id);
         if (checkAuthority(companyId,posting)){
@@ -97,7 +97,7 @@ public class PostingService {
         }
     }
 
-    private Posting findByPostingId(int id){
+    public Posting findByPostingId(int id){
         return memoryPostingRepository.findById(id)
                 .orElseThrow(()->new NotFoundException("Posting not found by post id: "+id));
     }
@@ -112,7 +112,7 @@ public class PostingService {
             return true;
         } throw new NotFoundException("Posting not found by company id:"+companyId);
     }
-
+    @Transactional
     public List<PostList> readAll() {
         //게시글이 없을 땐 어떻게 하지
         List<PostList> postList = postListRepository.findAll();
@@ -122,7 +122,7 @@ public class PostingService {
     public List<PostList> readByKeyword(String keyword) {
         return postListRepository.findByKeyword(keyword);
     }
-
+    @Transactional
     public PostingDetail readOne(int postingId) {
         PostingDetail postingDetail = memoryPostingRepository.readOne(postingId);
         if (postingDetail==null){
@@ -130,21 +130,12 @@ public class PostingService {
         }
         return postingDetail;
     }
-
-    public List<Integer> readIdList(int postingId) {
-        String companyId = findCompanyId(postingId);
-        List<Integer> listBfRemove = idListService.readIdListByCompanyId(companyId);
-        return removeId(listBfRemove, postingId);
-    }
-    private String findCompanyId(int postingId){
+    public String findCompanyId(int postingId){
         Posting posting = findByPostingId(postingId);
         return posting.getCompany().getId();
     }
-    private List<Integer> removeId(List<Integer> list, int postingId){
-        list.removeIf(id->id.equals(postingId));
-        return  list;
-    }
 }
+
 
 
 

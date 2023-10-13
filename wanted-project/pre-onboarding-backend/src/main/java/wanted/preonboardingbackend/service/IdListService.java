@@ -12,7 +12,10 @@ import java.util.List;
 public class IdListService {
     @Autowired
     PostingIdListRepository postingIdListRepository;
-    public List<Integer> readIdListByCompanyId(String companyId){
+    @Autowired
+    PostingService postingService;
+
+    public List<Integer> readIdListByCompanyId(String companyId) {
         return postingIdListRepository.findPostingIdListByCompanyId(companyId);
     }
 
@@ -20,10 +23,20 @@ public class IdListService {
         PostingIdList list = createIdList(savedPosting);
         postingIdListRepository.save(list);
     }
-    private PostingIdList createIdList(Posting posting){
+
+    private PostingIdList createIdList(Posting posting) {
         int postingId = posting.getId();
         String companyId = posting.getCompany().getId();
         PostingIdList list = new PostingIdList(postingId, companyId);
         return list;
     }
+    private List<Integer> removeId(List<Integer> list, int postingId) {
+        list.removeIf(id -> id.equals(postingId));
+        return list;
+    }
+    public List<Integer> readIdList(int postingId, String companyId) {
+        List<Integer> listBfRemove = readIdListByCompanyId(companyId);
+        return removeId(listBfRemove, postingId);
+    }
+
 }

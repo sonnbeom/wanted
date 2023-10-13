@@ -9,6 +9,8 @@ import wanted.preonboardingbackend.dto.PostingDetail;
 import wanted.preonboardingbackend.dto.PostingDto;
 import wanted.preonboardingbackend.dto.PostingUpdateDto;
 import wanted.preonboardingbackend.entity.PostList;
+import wanted.preonboardingbackend.entity.Posting;
+import wanted.preonboardingbackend.service.IdListService;
 import wanted.preonboardingbackend.service.PostingService;
 
 import java.util.List;
@@ -17,6 +19,8 @@ import java.util.List;
 public class PostingController {
     @Autowired
     PostingService postingService;
+    @Autowired
+    IdListService idListService;
     /**
      *
      * @Param BoardFormDto
@@ -26,7 +30,8 @@ public class PostingController {
      */
     @PostMapping("/register")
     public String uploadPosting(@ModelAttribute PostingDto postingDto){
-        postingService.register(postingDto);
+        Posting posting = postingService.register(postingDto);
+        idListService.insertPostIdList(posting);
         return "";
     }
     @GetMapping("home")
@@ -81,7 +86,8 @@ public class PostingController {
     @GetMapping("/posting/{postingId}")
     public String readOne(@PathVariable int postingId, Model model){
         PostingDetail postingDetail = postingService.readOne(postingId);
-        List<Integer> idList = postingService.readIdList(postingId);
+        String companyId = postingService.findCompanyId(postingId);
+        List<Integer> idList = idListService.readIdList(postingId,companyId);
         model.addAttribute("postingdetail", postingDetail);
         model.addAttribute("idlist", idList);
         System.out.println("_________--------------id list: "+idList);
