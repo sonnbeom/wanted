@@ -8,9 +8,9 @@ import wanted.preonboardingbackend.entity.PostingIdList;
 
 import java.util.List;
 @Repository
+public interface PostingIdListRepository extends JpaRepository<PostingIdList, Integer> {
 
-public interface PostingIdListRepository extends JpaRepository<Integer, PostingIdList> {
-
-    @Query("SELECT p.postingId FROM posting_id_list p WHERE p.companyId = :companyId")
-    List<Integer> findPostingIdsByCompanyId(@Param("companyId") String companyId);
+    @Query("SELECT p.posting_id FROM posting_id_list p WHERE p.companyId = :companyId")
+    List<Integer> findPostingIdListByCompanyId(@Param("companyId") String companyId);
+    PostingIdList save(PostingIdList postingIdList);
 }

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Posting Detail</title>
+</head>
+<body>
+<h1>Posting Detail</h1>
+
+<!-- Check if the postingdetail is not null -->
+<div th:if="${postingdetail != null}">
+  <p>Posting ID: <span th:text="${postingdetail.posting_id}"></span></p>
+  <p>Company Name: <span th:text="${postingdetail.companyName}"></span></p>
+  <p>Country: <span th:text="${postingdetail.country}"></span></p>
+  <p>Region: <span th:text="${postingdetail.region}"></span></p>
+  <p>Position: <span th:text="${postingdetail.position}"></span></p>
+  <p>Pay: <span th:text="${postingdetail.pay}"></span></p>
+  <p>Technology: <span th:text="${postingdetail.technology}"></span></p>
+  <p>Content: <span th:text="${postingdetail.content}"></span></p>
+
+  <!-- Check if idlist is not empty -->
+  <div th:if="${idlist != null and not #lists.isEmpty(idlist)}">
+    <h2>Related Posting IDs</h2>
+    <ul>
+      <!-- Iterate over the idlist and display each ID -->
+      <li th:each="id : ${idlist}" th:text="${id}"></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

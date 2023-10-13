@@ -3,6 +3,7 @@ package wanted.preonboardingbackend.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import wanted.preonboardingbackend.dto.ListPostingDto;
+import wanted.preonboardingbackend.dto.PostingDetail;
 import wanted.preonboardingbackend.dto.PostingDto;
 import wanted.preonboardingbackend.dto.PostingUpdateDto;
 import wanted.preonboardingbackend.entity.Company;
@@ -13,6 +14,7 @@ import wanted.preonboardingbackend.exception.NotFoundException;
 import wanted.preonboardingbackend.repository.MemoryCompanyRepository;
 import wanted.preonboardingbackend.repository.MemoryPostingRepository;
 import wanted.preonboardingbackend.repository.PostListRepository;
+import wanted.preonboardingbackend.repository.PostingIdListRepository;
 
 
 import java.lang.reflect.Field;
@@ -29,19 +31,18 @@ public class PostingService {
     CompanyService companyService;
     @Autowired
     PostListRepository postListRepository;
+    @Autowired
+    IdListService idListService;
+
 
 
     public void register(PostingDto postingDto) {
-
         Company company = findByCompanyId(postingDto.getCompanyId());
         Posting posting = new Posting(postingDto,company);
         Posting savedPosting = memoryPostingRepository.save(posting);
-        insertPostIdList(savedPosting);
+        idListService.insertPostIdList(savedPosting);
     }
-    private void insertPostIdList(Posting posting) {
-        int postingId = posting.getId();
 
-    }
     private Company findByCompanyId(String companyId){
         return companyService.findById(companyId);
     }
@@ -88,10 +89,6 @@ public class PostingService {
         Posting posting =  setUpdatePosting(updateDto, existingposting);
         memoryPostingRepository.save(posting);
     }
-//    private Posting toUpdateEntity(PostingDto dto, String companyId){
-//        dto.setCompanyId(companyId);
-//        return new Posting(dto);
-//    }
 
     public void delete(int id, String companyId) {
         Posting posting = findByPostingId(id);
@@ -99,20 +96,12 @@ public class PostingService {
             memoryPostingRepository.deleteById(id);
         }
     }
-//    public void delete(int id, String companyId){
-//        PostingDto postingDto = findPostingDtoById(id);
-//        if (checkAuthority(companyId,postingDto)){
-//            memoryPostingRepository.deleteById(id);
-//        }
-//    }
+
     private Posting findByPostingId(int id){
         return memoryPostingRepository.findById(id)
                 .orElseThrow(()->new NotFoundException("Posting not found by post id: "+id));
     }
-//    private PostingDto findPostingDtoById(int id){
-//        return memoryPostingRepository.findPostingDtoById(id)
-//                .orElseThrow(()->new NotFoundException("Posting not found by post id "+ id));
-//    }
+
     private boolean checkAuthority(String companyId, Posting posting){
         if (posting.getCompany().getId().equals(companyId)){
             return true;
@@ -133,7 +122,44 @@ public class PostingService {
     public List<PostList> readByKeyword(String keyword) {
         return postListRepository.findByKeyword(keyword);
     }
+
+    public PostingDetail readOne(int postingId) {
+        PostingDetail postingDetail = memoryPostingRepository.readOne(postingId);
+        if (postingDetail==null){
+            throw new NotFoundException("해당 posting id로는 posting을 조회할 수 없습니다."+ postingId);
+        }
+        return postingDetail;
+    }
+
+    public List<Integer> readIdList(int postingId) {
+        String companyId = findCompanyId(postingId);
+        List<Integer> listBfRemove = idListService.readIdListByCompanyId(companyId);
+        return removeId(listBfRemove, postingId);
+    }
+    private String findCompanyId(int postingId){
+        Posting posting = findByPostingId(postingId);
+        return posting.getCompany().getId();
+    }
+    private List<Integer> removeId(List<Integer> list, int postingId){
+        list.removeIf(id->id.equals(postingId));
+        return  list;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //    public static void checkNull(PostingDto postingDto) {
 //        if (postingDto == null) {
 //            throw new IllegalArgumentException("postingDto cannot be null");

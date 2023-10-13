@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import wanted.preonboardingbackend.dto.ListPostingDto;
+import wanted.preonboardingbackend.dto.PostingDetail;
 import wanted.preonboardingbackend.dto.PostingDto;
 import wanted.preonboardingbackend.dto.PostingUpdateDto;
 import wanted.preonboardingbackend.entity.PostList;
@@ -76,5 +77,18 @@ public class PostingController {
         }
         model.addAttribute("postinglist", list);
         return "searchresult";
+    }
+    @GetMapping("/posting/{postingId}")
+    public String readOne(@PathVariable int postingId, Model model){
+        PostingDetail postingDetail = postingService.readOne(postingId);
+        List<Integer> idList = postingService.readIdList(postingId);
+        model.addAttribute("postingdetail", postingDetail);
+        model.addAttribute("idlist", idList);
+        System.out.println("_________--------------id list: "+idList);
+        return "postingdetail";
+    }
+    @GetMapping("list")
+    public String readOneTest(){
+        return "list";
     }
 }

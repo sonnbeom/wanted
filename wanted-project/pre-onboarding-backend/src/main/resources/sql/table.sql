@@ -26,4 +26,8 @@ SELECT p.posting_id, c.company_name, c.country, c.region, p.position, p.pay, p.t
 FROM posting p
 JOIN company c ON p.company_id = c.company_id;
 
+CREATE TABLE posting_id_list (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     company_id VARCHAR(255),
+     posting_id INT )
 
