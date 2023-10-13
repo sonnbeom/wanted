@@ -31,3 +31,10 @@ CREATE TABLE posting_id_list (
      company_id VARCHAR(255),
      posting_id INT )
 
+CREATE TABLE Member (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(255),
+    pwd VARCHAR(255),
+    applied BOOLEAN
+);
+
